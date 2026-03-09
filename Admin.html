@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PercentGame — Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&family=Baloo+2:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:          #e8d9c8;
+    --panel:       rgba(42, 31, 23, 0.88);
+    --panel2:      rgba(62, 44, 30, 0.80);
+    --beige:       #c9a882;
+    --beige-lt:    #f0dfc5;
+    --cream:       #fdf6ee;
+    --accent:      #d4924a;
+    --accent2:     #b87333;
+    --brown-dk:    rgba(20, 13, 8, 0.92);
+    --text-main:   #f5ede0;
+    --text-muted:  #c4a07a;
+    --pill-bg:     rgba(80, 56, 38, 0.85);
+    --pill-border: rgba(160, 110, 65, 0.7);
+    --green:       #6dbf8a;
+    --red:         #e07070;
+    --purple:      #a78bfa;
+    --radius:      14px;
+    --radius-sm:   8px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    min-height: 100vh;
+    background: var(--bg);
+    background-image: url('/assets/fond/PLANNING_KWIKWIII.png');
+    background-size: cover; background-position: center; background-attachment: fixed;
+    font-family: 'Nunito', sans-serif; color: var(--text-main);
+  }
+  body::before {
+    content: ''; position: fixed; inset: 0;
+    background: rgba(20, 12, 6, 0.55); pointer-events: none; z-index: 0;
+  }
+  .app { position: relative; z-index: 1; display: flex; flex-direction: column; min-height: 100vh; }
+  header {
+    background: var(--panel); border-bottom: 2px solid var(--pill-border);
+    padding: 14px 28px; display: flex; align-items: center; gap: 14px;
+    backdrop-filter: blur(8px); box-shadow: 0 4px 24px rgba(0,0,0,0.4); flex-shrink: 0;
+  }
+  .logo { font-family: 'Baloo 2', sans-serif; font-size: 24px; font-weight: 800; color: var(--cream); letter-spacing: 0.04em; }
+  .logo span { color: var(--accent); }
+  .twitch-status {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--pill-bg); border: 1.5px solid var(--pill-border);
+    border-radius: 30px; padding: 5px 14px; font-size: 13px; font-weight: 800; color: var(--text-muted);
+  }
+  .status-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--text-muted); transition: all 0.3s; }
+  .status-dot.connected { background: var(--green); box-shadow: 0 0 8px var(--green); }
+  .phase-pill {
+    margin-left: auto; display: flex; align-items: center; gap: 8px;
+    border-radius: 30px; padding: 5px 16px; font-size: 12px; font-weight: 900;
+    text-transform: uppercase; letter-spacing: 1.5px;
+    border: 1.5px solid var(--pill-border); background: var(--pill-bg); color: var(--text-muted);
+  }
+  .phase-pill.playing { background: rgba(109,191,138,0.15); border-color: rgba(109,191,138,0.5); color: var(--green); }
+  .phase-pill.stopped { background: rgba(224,112,112,0.15); border-color: rgba(224,112,112,0.5); color: var(--red); }
+  .phase-pill.leaderboard { background: rgba(167,139,250,0.15); border-color: rgba(167,139,250,0.5); color: var(--purple); }
+  .blink { animation: blink 1.8s ease-in-out infinite; }
+  @keyframes blink { 0%,100%{opacity:.5} 50%{opacity:1} }
+  .main { display: grid; grid-template-columns: 320px 1fr; gap: 0; flex: 1; }
+  .sidebar {
+    background: var(--panel); border-right: 2px solid var(--pill-border);
+    padding: 20px 18px; display: flex; flex-direction: column; gap: 18px;
+    overflow-y: auto; backdrop-filter: blur(8px);
+  }
+  .content { padding: 20px; display: flex; flex-direction: column; gap: 18px; overflow-y: auto; }
+  .card {
+    background: var(--panel); border: 2px solid var(--pill-border);
+    border-radius: var(--radius); padding: 18px 20px;
+    backdrop-filter: blur(6px); box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  }
+  .card-title {
+    font-family: 'Baloo 2', sans-serif; font-size: 16px; font-weight: 800;
+    color: var(--beige-lt); letter-spacing: 0.04em;
+    padding-bottom: 12px; border-bottom: 2px solid var(--pill-border); margin-bottom: 14px;
+  }
+  label { display: block; font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 5px; }
+  input, select {
+    width: 100%; background: var(--brown-dk); border: 1.5px solid var(--pill-border);
+    border-radius: var(--radius-sm); color: var(--text-main); padding: 9px 13px;
+    font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 700; margin-bottom: 12px; outline: none; transition: border-color 0.2s;
+  }
+  input:focus, select:focus { border-color: var(--accent); }
+  select option { background: #1a0f08; }
+  small { font-size: 11px; color: var(--text-muted); display: block; margin-top: -8px; margin-bottom: 12px; line-height: 1.4; }
+  small a { color: var(--accent); }
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+    padding: 10px 18px; border-radius: 30px; border: none;
+    font-family: 'Baloo 2', sans-serif; font-size: 14px; font-weight: 800;
+    cursor: pointer; transition: all 0.15s; letter-spacing: 0.04em; text-transform: uppercase;
+  }
+  .btn:active { transform: scale(0.96); }
+  .btn-full { width: 100%; }
+  .btn-sm { padding: 7px 14px; font-size: 12px; }
+  .btn-accent { background: linear-gradient(135deg, var(--accent2), var(--accent)); color: var(--cream); box-shadow: 0 4px 16px rgba(212,146,74,0.3); }
+  .btn-accent:hover { filter: brightness(1.07); }
+  .btn-ghost { background: var(--pill-bg); color: var(--beige-lt); border: 1.5px solid var(--pill-border); }
+  .btn-ghost:hover { background: rgba(100,70,45,0.9); }
+  .btn-green { background: linear-gradient(135deg, #27ae60, var(--green)); color: #0a1f0f; box-shadow: 0 4px 14px rgba(109,191,138,0.3); }
+  .btn-red { background: linear-gradient(135deg, #c0392b, var(--red)); color: var(--cream); box-shadow: 0 4px 14px rgba(224,112,112,0.25); }
+  .btn-purple { background: linear-gradient(135deg, #7c5cfc, var(--purple)); color: var(--cream); box-shadow: 0 4px 14px rgba(167,139,250,0.25); }
+  .btn-danger-ghost { background: transparent; color: var(--red); border: 1.5px solid rgba(224,112,112,0.4); }
+  .btn-danger-ghost:hover { background: rgba(224,112,112,0.1); }
+  .controls-grid { display: flex; flex-direction: column; gap: 9px; }
+  .divider { height: 1px; background: var(--pill-border); opacity: 0.4; margin: 2px 0; }
+  .deco-bar { height: 3px; background: linear-gradient(90deg, var(--accent2), var(--accent), var(--beige)); border-radius: 3px; margin-bottom: 14px; }
+  .info-note { font-size: 11px; font-weight: 700; color: var(--text-muted); background: rgba(212,146,74,0.08); border: 1px solid rgba(212,146,74,0.2); border-radius: var(--radius-sm); padding: 8px 12px; margin-top: -4px; margin-bottom: 12px; line-height: 1.5; }
+  .info-note strong { color: var(--accent); }
+  /* Monitor */
+  .question-display { text-align: center; font-family: 'Baloo 2', sans-serif; font-size: 22px; font-weight: 800; color: var(--cream); background: var(--panel2); border: 1.5px solid var(--pill-border); border-radius: var(--radius-sm); padding: 14px 20px; margin-bottom: 12px; }
+  .question-display .axis { font-size: 13px; color: var(--text-muted); font-weight: 700; margin-top: 6px; font-family: 'Nunito', sans-serif; }
+  .winner-strip { display: none; text-align: center; background: rgba(109,191,138,0.12); border: 2px solid rgba(109,191,138,0.4); border-radius: var(--radius-sm); padding: 12px; margin-bottom: 10px; font-family: 'Baloo 2', sans-serif; font-size: 18px; font-weight: 800; color: var(--green); animation: slideIn 0.35s ease; }
+  .winner-strip.show { display: block; }
+  @keyframes slideIn { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:none} }
+  .avg-giant { font-family: 'Baloo 2', sans-serif; font-size: 72px; font-weight: 800; text-align: center; line-height: 1; color: var(--accent); text-shadow: 0 0 40px rgba(212,146,74,0.4); padding: 12px 0; }
+  .guesses-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 7px; max-height: 200px; overflow-y: auto; padding: 4px; }
+  .guess-chip { background: var(--panel2); border: 1.5px solid var(--pill-border); border-radius: var(--radius-sm); padding: 7px 11px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; }
+  .guess-chip .gname { color: var(--text-muted); font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 75px; }
+  .guess-chip .gval { font-family: 'Baloo 2', sans-serif; font-size: 14px; font-weight: 800; color: var(--accent); }
+  /* Table */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; padding: 9px 12px; font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); font-weight: 800; border-bottom: 2px solid var(--pill-border); }
+  td { padding: 9px 12px; border-bottom: 1px solid rgba(160,110,65,0.15); vertical-align: middle; }
+  tr:hover td { background: rgba(212,146,74,0.05); }
+  tr.active-row td { background: rgba(212,146,74,0.14) !important; }
+  table input { margin: 0; padding: 6px 10px; font-size: 13px; border-radius: 6px; }
+  .answer-tag { display: inline-block; background: linear-gradient(135deg, var(--accent2), var(--accent)); color: var(--cream); border-radius: 20px; padding: 3px 11px; font-family: 'Baloo 2', sans-serif; font-size: 13px; font-weight: 800; min-width: 44px; text-align: center; }
+  /* Leaderboard */
+  .lb-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .lb-item { display: flex; align-items: center; gap: 12px; padding: 10px 16px; background: var(--panel2); border: 1.5px solid rgba(160,110,65,0.2); border-radius: var(--radius-sm); animation: slideIn 0.3s ease both; }
+  .lb-rank { font-size: 18px; width: 28px; text-align: center; flex-shrink: 0; }
+  .lb-name { flex: 1; font-size: 15px; font-weight: 800; color: var(--beige-lt); }
+  .lb-score { font-family: 'Baloo 2', sans-serif; font-size: 17px; font-weight: 800; color: var(--accent); }
+  .lb-score::after { content: ' pts'; font-size: 10px; color: var(--text-muted); font-weight: 700; }
+  /* Tabs */
+  .tabs { display: flex; gap: 4px; background: var(--brown-dk); border-radius: 30px; padding: 4px; margin-bottom: 16px; }
+  .tab { flex: 1; padding: 8px 12px; border-radius: 30px; border: none; background: transparent; color: var(--text-muted); font-family: 'Baloo 2', sans-serif; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; cursor: pointer; transition: all 0.15s; }
+  .tab.active { background: var(--pill-bg); color: var(--beige-lt); border: 1px solid var(--pill-border); }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+  /* Toast */
+  .toast { position: fixed; bottom: 24px; right: 24px; background: var(--panel); border: 2px solid var(--pill-border); border-radius: var(--radius); padding: 12px 20px; font-size: 14px; font-weight: 800; color: var(--beige-lt); transform: translateY(80px); opacity: 0; transition: all 0.3s; z-index: 999; box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast.success { border-color: rgba(109,191,138,0.6); color: var(--green); }
+  .toast.error { border-color: rgba(224,112,112,0.6); color: var(--red); }
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--pill-border); border-radius: 3px; }
+  .empty-state { text-align: center; color: var(--text-muted); font-size: 13px; font-weight: 700; padding: 28px; }
+  .row-count { font-size: 11px; font-weight: 800; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px; }
+</style>
+</head>
+<body>
+<div class="app">
+
+<header>
+  <div class="logo">Percent<span>Game</span></div>
+  <div class="twitch-status">
+    <div class="status-dot" id="twitchDot"></div>
+    <span id="twitchLabel">Twitch déconnecté</span>
+  </div>
+  <div class="phase-pill" id="phasePill">
+    <span class="blink">●</span> <span id="phaseText">Idle</span>
+  </div>
+</header>
+
+<div class="main">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+
+    <div class="card">
+      <div class="card-title">🎮 Connexion Twitch</div>
+      <div class="info-note">Les credentials sont chargés depuis le <strong>.env</strong> au démarrage du serveur. Modifie ici uniquement pour changer en live.</div>
+      <label>Channel</label>
+      <input id="tChannel" type="text" placeholder="monpseudo">
+      <label>Bot Username</label>
+      <input id="tUser" type="text" placeholder="monbot">
+      <label>OAuth Token</label>
+      <input id="tToken" type="password" placeholder="oauth:xxxxxxxxxxxxxxx">
+      <small>Générer sur <a href="https://twitchapps.com/tmi/" target="_blank">twitchapps.com/tmi</a></small>
+      <button class="btn btn-accent btn-full" onclick="connectTwitch()">Connecter</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📊 Import Google Sheets</div>
+      <label>URL du Sheets public</label>
+      <input id="sheetsUrl" type="text" placeholder="https://docs.google.com/spreadsheets/d/...">
+      <small>Fichier partagé en lecture publique. Colonnes : A=label, B=réponse (0-100), C=label min, D=label max</small>
+      <label>Nom du thème</label>
+      <input id="themeName" type="text" placeholder="Ex: Température, Popularité…">
+      <button class="btn btn-ghost btn-full" onclick="importSheets()">⬇ Importer</button>
+      <div style="height:10px"></div>
+      <label>Thème actif</label>
+      <select id="themeSelect" onchange="loadTheme()">
+        <option value="">— Choisir un thème —</option>
+      </select>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🎯 Contrôles du jeu</div>
+      <div class="controls-grid">
+        <button class="btn btn-green btn-full" onclick="startRound()">▶ Lancer la question</button>
+        <button class="btn btn-red btn-full" onclick="stopRound()">⏹ Stop — Révéler réponse</button>
+        <div class="divider"></div>
+        <button class="btn btn-purple btn-full" onclick="showLeaderboard()">🏆 Afficher classement</button>
+        <button class="btn btn-ghost btn-full" onclick="setIdle()">↩ Retour idle</button>
+        <div class="divider"></div>
+        <button class="btn btn-danger-ghost btn-full btn-sm" onclick="resetScores()">🗑 Réinitialiser les scores</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <div class="card">
+      <div class="deco-bar"></div>
+      <div class="card-title" style="border:none;padding:0;margin-bottom:10px">
+        📡 Live Monitor
+        <span id="guessCount" style="font-size:12px;color:var(--text-muted);font-family:Nunito;font-weight:700;margin-left:8px">0 propositions</span>
+      </div>
+      <div id="questionDisplay" class="question-display">
+        Aucune question active
+        <div class="axis"></div>
+      </div>
+      <div class="winner-strip" id="winnerStrip">🎉 <span id="winnerName"></span> a trouvé la bonne réponse !</div>
+      <div class="avg-giant" id="avgDisplay">—</div>
+      <div class="guesses-grid" id="guessesGrid">
+        <div class="empty-state">En attente de propositions…</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('questions')">Questions</button>
+        <button class="tab" onclick="switchTab('leaderboard')">Classement</button>
+      </div>
+      <div id="tab-questions" class="tab-panel active">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <span class="row-count" id="questionCount">0 questions</span>
+          <button class="btn btn-ghost btn-sm" onclick="addRow()">+ Ajouter</button>
+        </div>
+        <div class="table-wrap" id="questionsContainer">
+          <div class="empty-state">Importe un Google Sheets pour commencer</div>
+        </div>
+      </div>
+      <div id="tab-leaderboard" class="tab-panel">
+        <ul class="lb-list" id="leaderboardList">
+          <li style="text-align:center;color:var(--text-muted);padding:20px;list-style:none;font-weight:700">Aucun score enregistré</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+let questions = [], themes = {}, selectedRow = null, ws = null, gameState = {};
+
+function connectWS() {
+  const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+  ws = new WebSocket(`${protocol}//${location.host}`);
+  ws.onmessage = (e) => {
+    const msg = JSON.parse(e.data);
+    if (msg.type === 'state') { gameState = msg.payload; updateUI(); }
+    if (msg.type === 'average') {
+      document.getElementById('avgDisplay').textContent = msg.value !== null ? msg.value + '%' : '—';
+      document.getElementById('guessCount').textContent = msg.guessCount + ' proposition' + (msg.guessCount !== 1 ? 's' : '');
+    }
+    if (msg.type === 'twitch_status') updateTwitchStatus(msg.connected, msg.channel, msg.error);
+  };
+  ws.onclose = () => setTimeout(connectWS, 2000);
+}
+
+function updateTwitchStatus(ok, ch, err) {
+  const dot = document.getElementById('twitchDot');
+  const lbl = document.getElementById('twitchLabel');
+  if (ok) { dot.classList.add('connected'); lbl.textContent = '#' + ch; toast('Twitch connecté !', 'success'); }
+  else { dot.classList.remove('connected'); lbl.textContent = 'Twitch déconnecté'; if (err) toast('Erreur : ' + err, 'error'); }
+}
+
+function updateUI() {
+  const { phase, question, guesses, scores, winner } = gameState;
+  const pill = document.getElementById('phasePill');
+  const pm = { idle:['','Idle'], playing:['playing','En cours'], stopped:['stopped','Arrêté'], leaderboard:['leaderboard','Classement'] };
+  const [cls, lbl] = pm[phase] || ['','Idle'];
+  pill.className = 'phase-pill ' + cls;
+  document.getElementById('phaseText').textContent = lbl;
+  if (question) {
+    document.getElementById('questionDisplay').innerHTML = `${esc(question.label)}<div class="axis">${esc(question.minLabel)} ← 0 ——— 100 → ${esc(question.maxLabel)}</div>`;
+  } else {
+    document.getElementById('questionDisplay').innerHTML = 'Aucune question active<div class="axis"></div>';
+  }
+  const ws2 = document.getElementById('winnerStrip');
+  if (winner) { document.getElementById('winnerName').textContent = winner; ws2.classList.add('show'); }
+  else ws2.classList.remove('show');
+  const grid = document.getElementById('guessesGrid');
+  const entries = Object.entries(guesses || {});
+  grid.innerHTML = entries.length ? entries.map(([n,v]) => `<div class="guess-chip"><span class="gname">${esc(n)}</span><span class="gval">${v}%</span></div>`).join('') : '<div class="empty-state">En attente de propositions…</div>';
+  document.getElementById('guessCount').textContent = entries.length + ' proposition' + (entries.length !== 1 ? 's' : '');
+  renderLeaderboard(scores || {});
+}
+
+function renderLeaderboard(scores) {
+  const list = document.getElementById('leaderboardList');
+  const medals = ['🥇','🥈','🥉'];
+  const sorted = Object.entries(scores).sort((a,b) => b[1]-a[1]);
+  if (!sorted.length) { list.innerHTML = '<li style="text-align:center;color:var(--text-muted);padding:20px;list-style:none;font-weight:700">Aucun score enregistré</li>'; return; }
+  list.innerHTML = sorted.map(([name, score], i) => `<li class="lb-item" style="animation-delay:${i*0.04}s"><span class="lb-rank">${i<3?medals[i]:i+1}</span><span class="lb-name">${esc(name)}</span><span class="lb-score">${score}</span></li>`).join('');
+}
+
+async function connectTwitch() {
+  const channel = document.getElementById('tChannel').value.trim();
+  const username = document.getElementById('tUser').value.trim();
+  const token = document.getElementById('tToken').value.trim();
+  if (!channel || !username || !token) { toast('Remplis tous les champs Twitch', 'error'); return; }
+  await fetch('/api/twitch/connect', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({channel,username,token}) });
+}
+
+async function importSheets() {
+  const url = document.getElementById('sheetsUrl').value.trim();
+  const name = document.getElementById('themeName').value.trim() || 'Thème ' + (Object.keys(themes).length + 1);
+  if (!url) { toast('Entre une URL Google Sheets', 'error'); return; }
+  const match = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+  if (!match) { toast('URL Google Sheets invalide', 'error'); return; }
+  const sheetId = match[1];
+  const gidMatch = url.match(/gid=(\d+)/);
+  const gid = gidMatch ? gidMatch[1] : '0';
+  const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=${gid}`;
+  try {
+    const r = await fetch(csvUrl);
+    if (!r.ok) throw new Error('Impossible de télécharger');
+    const text = await r.text();
+    const rows = parseCSV(text);
+    const parsed = rows.filter(r => r[0] && r[1]).map(r => ({ label:r[0].trim(), answer:parseFloat(r[1]), minLabel:r[2]?.trim()||'0', maxLabel:r[3]?.trim()||'100' })).filter(r => !isNaN(r.answer));
+    themes[name] = parsed; saveThemes(); refreshThemeSelect();
+    document.getElementById('themeSelect').value = name; loadTheme();
+    toast('✓ ' + parsed.length + ' questions importées — "' + name + '"', 'success');
+  } catch(e) { toast('Erreur : ' + e.message, 'error'); }
+}
+
+function parseCSV(text) {
+  return text.split('\n').map(line => { const cols=[]; let cur='', inQ=false; for (let ch of line) { if(ch==='"'){inQ=!inQ;} else if(ch===','&&!inQ){cols.push(cur);cur='';} else cur+=ch; } cols.push(cur); return cols; }).filter(r => r.some(c => c.trim()));
+}
+
+function saveThemes() { try { localStorage.setItem('pg_themes', JSON.stringify(themes)); } catch(e){} }
+function loadThemes() { try { const s = localStorage.getItem('pg_themes'); if(s) themes = JSON.parse(s); } catch(e){} }
+function refreshThemeSelect() {
+  const sel = document.getElementById('themeSelect');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">— Choisir un thème —</option>' + Object.keys(themes).map(k => `<option value="${k}">${k} (${themes[k].length})</option>`).join('');
+  if (cur) sel.value = cur;
+}
+function loadTheme() {
+  const sel = document.getElementById('themeSelect').value;
+  if (!sel || !themes[sel]) return;
+  questions = themes[sel].map(q => ({...q})); selectedRow = null; renderTable();
+}
+
+function renderTable() {
+  const container = document.getElementById('questionsContainer');
+  document.getElementById('questionCount').textContent = questions.length + ' questions';
+  if (!questions.length) { container.innerHTML = '<div class="empty-state">Aucune question</div>'; return; }
+  container.innerHTML = `<table><thead><tr><th>#</th><th>Label / Objet</th><th>Min</th><th>Max</th><th>Réponse</th><th></th></tr></thead><tbody>${
+    questions.map((q,i) => `<tr id="row-${i}" class="${selectedRow===i?'active-row':''}" onclick="selectRow(${i})">
+      <td style="color:var(--text-muted);font-weight:800">${i+1}</td>
+      <td><input type="text" value="${esc(q.label)}" oninput="questions[${i}].label=this.value" onclick="event.stopPropagation()"></td>
+      <td><input type="text" value="${esc(q.minLabel)}" oninput="questions[${i}].minLabel=this.value" onclick="event.stopPropagation()" style="width:80px"></td>
+      <td><input type="text" value="${esc(q.maxLabel)}" oninput="questions[${i}].maxLabel=this.value" onclick="event.stopPropagation()" style="width:80px"></td>
+      <td><span class="answer-tag">${q.answer}</span><input type="number" min="0" max="100" step="0.1" value="${q.answer}" oninput="questions[${i}].answer=parseFloat(this.value);this.previousElementSibling.textContent=this.value" onclick="event.stopPropagation()" style="width:64px;margin-left:8px"></td>
+      <td><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();deleteRow(${i})">✕</button></td>
+    </tr>`).join('')
+  }</tbody></table>`;
+}
+
+function selectRow(i) {
+  selectedRow = i;
+  document.querySelectorAll('tbody tr').forEach(r => r.classList.remove('active-row'));
+  document.getElementById('row-'+i)?.classList.add('active-row');
+}
+function addRow() { questions.push({label:'Nouvelle question',answer:50,minLabel:'0',maxLabel:'100'}); renderTable(); selectRow(questions.length-1); }
+function deleteRow(i) { questions.splice(i,1); if(selectedRow===i)selectedRow=null; else if(selectedRow>i)selectedRow--; renderTable(); }
+
+async function startRound() {
+  if (selectedRow === null) { toast('Sélectionne une question dans le tableau', 'error'); return; }
+  const q = questions[selectedRow];
+  if (!q || isNaN(q.answer)) { toast('Question invalide', 'error'); return; }
+  await fetch('/api/game/start', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(q) });
+  toast('▶ ' + q.label, 'success');
+}
+async function stopRound() { await fetch('/api/game/stop',{method:'POST'}); toast('⏹ Round arrêté','success'); }
+async function showLeaderboard() { await fetch('/api/game/leaderboard',{method:'POST'}); }
+async function setIdle() { await fetch('/api/game/idle',{method:'POST'}); }
+async function resetScores() { if(!confirm('Réinitialiser tous les scores ?'))return; await fetch('/api/game/reset-scores',{method:'POST'}); toast('Scores réinitialisés','success'); }
+
+function switchTab(id) {
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', ['questions','leaderboard'][i]===id));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id==='tab-'+id));
+}
+
+let toastTimer;
+function toast(msg, type='') { const el=document.getElementById('toast'); el.textContent=msg; el.className='toast show '+type; clearTimeout(toastTimer); toastTimer=setTimeout(()=>el.classList.remove('show'),3000); }
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+loadThemes(); refreshThemeSelect(); connectWS();
+fetch('/api/state').then(r=>r.json()).then(s=>{gameState=s;updateUI();});
+</script>
+</body>
+</html>
