@@ -10,6 +10,35 @@ const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
 app.use(express.json());
+
+// ── Auth ────────────────────────────────────────────────────────────────────
+const TOKENS = new Set();
+
+function generateToken() {
+  const t = Math.random().toString(36).slice(2) + Date.now().toString(36);
+  TOKENS.add(t);
+  return t;
+}
+
+// Login endpoint
+app.post('/api/login', (req, res) => {
+  const { password } = req.body;
+  const ADMIN_PASS = process.env.ADMIN_PASS || 'percentgame';
+  if (password === ADMIN_PASS) {
+    const token = generateToken();
+    res.json({ ok: true, token });
+  } else {
+    res.status(401).json({ ok: false });
+  }
+});
+
+// Auth middleware pour admin.html
+app.use('/admin.html', (req, res, next) => {
+  const token = req.query.token || req.headers['x-auth-token'];
+  if (token && TOKENS.has(token)) return next();
+  return res.redirect('/login.html');
+});
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ── Game State ──────────────────────────────────────────────────────────────

@@ -49,8 +49,8 @@
     background: var(--panel);
     border: 2px solid var(--pill-border);
     border-radius: 99px;
-    padding: 10px 32px;
-    display: flex; align-items: center; gap: 20px;
+    padding: 14px 40px;
+    display: flex; align-items: center; gap: 24px;
     box-shadow: 0 8px 32px rgba(0,0,0,0.5);
     white-space: nowrap;
     animation: bannerDrop 0.7s cubic-bezier(0.16,1,0.3,1) both;
@@ -60,19 +60,19 @@
     to   { transform: translateX(-50%) translateY(0); opacity: 1; }
   }
   .banner-axis {
-    font-size: 15px; font-weight: 800; color: var(--text-muted);
+    font-size: 20px; font-weight: 800; color: var(--text-muted);
     display: flex; align-items: center; gap: 10px;
   }
   .banner-label {
     font-family: 'Baloo 2', sans-serif;
-    font-size: 26px; font-weight: 800;
+    font-size: 30px; font-weight: 800;
     color: var(--cream);
   }
   .banner-sep {
-    width: 1px; height: 30px; background: var(--pill-border);
+    width: 1px; height: 36px; background: var(--pill-border);
   }
   .deco-dot {
-    width: 8px; height: 8px; border-radius: 50%; background: var(--accent);
+    width: 9px; height: 9px; border-radius: 50%; background: var(--accent);
     animation: blink 1.8s ease-in-out infinite;
   }
   @keyframes blink { 0%,100%{opacity:.5;transform:scale(1)} 50%{opacity:1;transform:scale(1.4)} }
@@ -305,11 +305,11 @@
   <!-- Banner -->
   <div class="question-banner" id="questionBanner">
     <span class="deco-dot"></span>
-    <div class="banner-axis"><span style="color:var(--accent);font-family:'Baloo 2',sans-serif">0%</span> <span id="minLbl">Froid</span></div>
+    <div class="banner-axis"><span style="color:var(--accent);font-family:'Baloo 2',sans-serif;font-size:22px">0%</span> <span id="minLbl">Froid</span></div>
     <div class="banner-sep"></div>
     <div class="banner-label" id="questionLbl">Café</div>
     <div class="banner-sep"></div>
-    <div class="banner-axis"><span id="maxLbl">Chaud</span> <span style="color:var(--accent);font-family:'Baloo 2',sans-serif">100%</span></div>
+    <div class="banner-axis"><span id="maxLbl">Chaud</span> <span style="color:var(--accent);font-family:'Baloo 2',sans-serif;font-size:22px">100%</span></div>
     <span class="deco-dot"></span>
   </div>
 

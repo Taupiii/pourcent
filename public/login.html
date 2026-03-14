@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PercentGame — Connexion</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&family=Baloo+2:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --accent:      #d4924a;
+    --accent2:     #b87333;
+    --beige:       #c9a882;
+    --beige-lt:    #f0dfc5;
+    --cream:       #fdf6ee;
+    --panel:       rgba(42, 31, 23, 0.92);
+    --panel2:      rgba(62, 44, 30, 0.80);
+    --brown-dk:    rgba(20, 13, 8, 0.95);
+    --text-main:   #f5ede0;
+    --text-muted:  #c4a07a;
+    --pill-bg:     rgba(80, 56, 38, 0.85);
+    --pill-border: rgba(160, 110, 65, 0.7);
+    --green:       #6dbf8a;
+    --red:         #e07070;
+    --radius:      16px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    min-height: 100vh;
+    background: #1a0f08;
+    background-image: url('/assets/fond/PLANNING_KWIKWIII.png');
+    background-size: cover;
+    background-position: center;
+    font-family: 'Nunito', sans-serif;
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  body::before {
+    content: ''; position: fixed; inset: 0;
+    background: rgba(15, 9, 4, 0.65);
+    pointer-events: none;
+  }
+
+  .login-wrap {
+    position: relative; z-index: 1;
+    width: 420px;
+    display: flex; flex-direction: column; align-items: center; gap: 32px;
+  }
+
+  /* Logo */
+  .logo {
+    text-align: center;
+  }
+  .logo-title {
+    font-family: 'Baloo 2', sans-serif;
+    font-size: 52px; font-weight: 800;
+    color: var(--cream); letter-spacing: 0.02em;
+    line-height: 1;
+  }
+  .logo-title span { color: var(--accent); }
+  .logo-sub {
+    font-size: 12px; font-weight: 800;
+    letter-spacing: 4px; text-transform: uppercase;
+    color: var(--text-muted); margin-top: 6px;
+  }
+
+  /* Deco bar */
+  .deco-bar {
+    width: 60px; height: 3px;
+    background: linear-gradient(90deg, var(--accent2), var(--accent), var(--beige));
+    border-radius: 3px;
+  }
+
+  /* Card */
+  .login-card {
+    width: 100%;
+    background: var(--panel);
+    border: 2px solid var(--pill-border);
+    border-radius: 24px;
+    padding: 36px 40px;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.03);
+  }
+
+  .card-title {
+    font-family: 'Baloo 2', sans-serif;
+    font-size: 18px; font-weight: 800;
+    color: var(--beige-lt); letter-spacing: 0.04em;
+    margin-bottom: 24px; text-align: center;
+  }
+
+  label {
+    display: block;
+    font-size: 11px; font-weight: 800;
+    color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 1.5px;
+    margin-bottom: 8px;
+  }
+
+  .input-wrap {
+    position: relative; margin-bottom: 20px;
+  }
+
+  input[type="password"] {
+    width: 100%;
+    background: var(--brown-dk);
+    border: 2px solid var(--pill-border);
+    border-radius: 12px;
+    color: var(--text-main);
+    padding: 14px 48px 14px 18px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 18px; font-weight: 700;
+    letter-spacing: 4px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  input[type="password"]:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(212,146,74,0.15);
+  }
+  input[type="password"].error {
+    border-color: var(--red);
+    box-shadow: 0 0 0 3px rgba(224,112,112,0.15);
+    animation: shake 0.4s ease;
+  }
+  @keyframes shake {
+    0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-5px)} 80%{transform:translateX(5px)}
+  }
+
+  /* Toggle password visibility */
+  .eye-btn {
+    position: absolute; right: 14px; top: 50%;
+    transform: translateY(-50%);
+    background: none; border: none; cursor: pointer;
+    color: var(--text-muted); font-size: 18px;
+    transition: color 0.2s; padding: 4px;
+  }
+  .eye-btn:hover { color: var(--accent); }
+
+  /* Error message */
+  .error-msg {
+    display: none;
+    font-size: 12px; font-weight: 800;
+    color: var(--red); text-align: center;
+    margin-top: -12px; margin-bottom: 16px;
+    animation: fadeIn 0.3s ease;
+  }
+  .error-msg.show { display: block; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(-4px)} to{opacity:1;transform:none} }
+
+  /* Submit button */
+  .btn-login {
+    width: 100%;
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    color: var(--cream);
+    border: none; border-radius: 12px;
+    padding: 14px;
+    font-family: 'Baloo 2', sans-serif;
+    font-size: 16px; font-weight: 800;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(212,146,74,0.3);
+    transition: all 0.15s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .btn-login:hover { filter: brightness(1.08); box-shadow: 0 6px 24px rgba(212,146,74,0.45); }
+  .btn-login:active { transform: scale(0.97); }
+  .btn-login.loading { opacity: 0.7; pointer-events: none; }
+
+  /* Footer */
+  .login-footer {
+    font-size: 11px; font-weight: 700;
+    color: rgba(196,160,122,0.4);
+    text-align: center; letter-spacing: 1px;
+  }
+</style>
+</head>
+<body>
+
+<div class="login-wrap">
+
+  <div class="logo">
+    <div class="logo-title">Percent<span>Game</span></div>
+    <div class="logo-sub">Interface Admin</div>
+  </div>
+
+  <div class="deco-bar"></div>
+
+  <div class="login-card">
+    <div class="card-title">🔐 Mot de passe</div>
+
+    <label for="password">Mot de passe</label>
+    <div class="input-wrap">
+      <input type="password" id="password" placeholder="••••••••" autocomplete="current-password" autofocus>
+      <button class="eye-btn" type="button" onclick="togglePass()" id="eyeBtn">👁</button>
+    </div>
+    <div class="error-msg" id="errorMsg">Mot de passe incorrect</div>
+
+    <button class="btn-login" id="loginBtn" onclick="doLogin()">
+      <span>Entrer</span> <span>→</span>
+    </button>
+  </div>
+
+  <div class="login-footer">kwikwiii.online • PercentGame</div>
+
+</div>
+
+<script>
+  // Submit on Enter
+  document.getElementById('password').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doLogin();
+  });
+
+  function togglePass() {
+    const input = document.getElementById('password');
+    const btn = document.getElementById('eyeBtn');
+    if (input.type === 'password') {
+      input.type = 'text';
+      btn.textContent = '🙈';
+    } else {
+      input.type = 'password';
+      btn.textContent = '👁';
+    }
+  }
+
+  async function doLogin() {
+    const pass = document.getElementById('password').value;
+    const input = document.getElementById('password');
+    const btn = document.getElementById('loginBtn');
+    const err = document.getElementById('errorMsg');
+
+    if (!pass) { showError(); return; }
+
+    btn.classList.add('loading');
+    btn.innerHTML = '<span>Vérification…</span>';
+    err.classList.remove('show');
+
+    try {
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: pass })
+      });
+
+      const data = await res.json();
+
+      if (data.ok) {
+        btn.innerHTML = '<span>✓ Accès accordé</span>';
+        btn.style.background = 'linear-gradient(135deg, #27ae60, #6dbf8a)';
+        setTimeout(() => {
+          window.location.href = '/admin.html?token=' + data.token;
+        }, 600);
+      } else {
+        showError();
+        btn.classList.remove('loading');
+        btn.innerHTML = '<span>Entrer</span> <span>→</span>';
+      }
+    } catch(e) {
+      showError();
+      btn.classList.remove('loading');
+      btn.innerHTML = '<span>Entrer</span> <span>→</span>';
+    }
+  }
+
+  function showError() {
+    const input = document.getElementById('password');
+    const err = document.getElementById('errorMsg');
+    input.classList.add('error');
+    err.classList.add('show');
+    setTimeout(() => input.classList.remove('error'), 500);
+  }
+</script>
+</body>
+</html>
